@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio – Alex Mercer</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --ink:    #0a0a0a;
+      --mid:    #4a4a4a;
+      --soft:   #9a9a9a;
+      --accent: #5b4cf5;
+      --accent2: #ff5e62;
+      --bg:     #ffffff;
+      --glass:  rgba(255,255,255,0.72);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+    h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+    /* ── Cursor ── */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transition: transform .15s ease;
+      mix-blend-mode: multiply;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transition: transform .35s ease, width .3s, height .3s;
+      mix-blend-mode: multiply;
+    }
+    body:hover .cursor-ring.hover { width: 56px; height: 56px; }
+
+    /* ── Noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: .4;
+    }
+
+    /* ── Navbar ── */
+    .nav-wrap {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      padding: 1.4rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .4s, backdrop-filter .4s, box-shadow .4s;
+    }
+    .nav-wrap.scrolled {
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 1px 32px rgba(0,0,0,.07);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.35rem;
+      color: var(--ink); text-decoration: none;
+      letter-spacing: -.5px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      font-size: .9rem; font-weight: 500;
+      color: var(--mid); text-decoration: none;
+      position: relative; padding-bottom: 2px;
+      transition: color .25s;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      height: 1.5px; width: 0; background: var(--accent);
+      transition: width .3s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 0 6vw;
+      position: relative; overflow: hidden;
+    }
+    /* Blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: .18;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .blob1 { width: 520px; height: 520px; background: var(--accent); top: -120px; right: -80px; animation-delay: 0s; }
+    .blob2 { width: 380px; height: 380px; background: var(--accent2); bottom: 40px; left: -60px; animation-delay: -4s; }
+    .blob3 { width: 260px; height: 260px; background: #00d4ff; top: 50%; right: 22%; animation-delay: -8s; }
+    @keyframes drift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(30px, 40px) scale(1.08); }
+    }
+
+    .hero-inner { position: relative; z-index: 1; max-width: 820px; }
+    .hero-eyebrow {
+      font-size: .82rem; font-weight: 500; letter-spacing: 3px;
+      color: var(--accent); text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      opacity: 0; transform: translateY(20px);
+      animation: rise .7s .2s forwards;
+    }
+    .hero-title {
+      font-size: clamp(2.8rem, 7vw, 5.8rem);
+      font-weight: 800; line-height: 1.06;
+      letter-spacing: -2px; color: var(--ink);
+      opacity: 0; transform: translateY(30px);
+      animation: rise .8s .4s forwards;
+    }
+    .hero-title .line2 { color: var(--accent); display: block; }
+    .hero-sub {
+      margin-top: 1.6rem;
+      font-size: 1.1rem; color: var(--mid); max-width: 520px; line-height: 1.8;
+      opacity: 0; transform: translateY(20px);
+      animation: rise .7s .65s forwards;
+    }
+    .hero-cta {
+      margin-top: 2.4rem; display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0; transform: translateY(20px);
+      animation: rise .7s .85s forwards;
+    }
+    .btn-primary-custom {
+      background: var(--accent); color: #fff;
+      padding: .8rem 2rem; border-radius: 100px;
+      font-weight: 600; font-size: .95rem;
+      border: none; cursor: pointer;
+      transition: box-shadow .3s, transform .2s;
+      text-decoration: none;
+    }
+    .btn-primary-custom:hover {
+      box-shadow: 0 8px 32px rgba(91,76,245,.35);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+    .btn-ghost {
+      background: transparent; color: var(--ink);
+      padding: .8rem 2rem; border-radius: 100px;
+      font-weight: 600; font-size: .95rem;
+      border: 1.5px solid #ddd; cursor: pointer;
+      transition: border-color .3s, transform .2s;
+      text-decoration: none;
+    }
+    .btn-ghost:hover { border-color: var(--accent); transform: translateY(-2px); color: var(--ink); }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute; bottom: 2.4rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      opacity: 0; animation: rise .7s 1.3s forwards;
+    }
+    .scroll-hint span { font-size: .75rem; letter-spacing: 2px; color: var(--soft); text-transform: uppercase; }
+    .scroll-line {
+      width: 1.5px; height: 48px; background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity: .3; transform: scaleY(.8); }
+      50%      { opacity: 1; transform: scaleY(1); }
+    }
+
+    @keyframes rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Section titles ── */
+    .section-label {
+      font-size: .78rem; font-weight: 600; letter-spacing: 3px;
+      color: var(--accent); text-transform: uppercase; margin-bottom: .7rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800; letter-spacing: -1px; line-height: 1.1;
+    }
+    section { padding: 6rem 6vw; }
+
+    /* ── About ── */
+    #about { background: #f8f8fc; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .about-img-wrap {
+      position: relative;
+    }
+    .about-img-wrap .frame {
+      width: 100%; aspect-ratio: 4/5;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #e8e4ff, #ffd6d6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7rem; color: var(--accent);
+      overflow: hidden;
+      position: relative;
+    }
+    .about-img-wrap .badge {
+      position: absolute; bottom: -1.2rem; right: -1.2rem;
+      background: var(--ink); color: #fff;
+      padding: 1.1rem 1.5rem; border-radius: 18px;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      line-height: 1.2;
+    }
+    .about-img-wrap .badge span { font-size: 2rem; display: block; }
+    .stat-row { display: flex; gap: 2rem; margin-top: 2rem; }
+    .stat-item { }
+    .stat-item .num {
+      font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-item .label { font-size: .85rem; color: var(--soft); }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.5rem; }
+    .skill-tag {
+      padding: .4rem 1rem; border-radius: 100px;
+      background: #efefff; color: var(--accent);
+      font-size: .82rem; font-weight: 500;
+      transition: background .2s;
+    }
+    .skill-tag:hover { background: var(--accent); color: #fff; }
+
+    /* ── Projects ── */
+    #projects { background: #fff; }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.8rem; margin-top: 3rem; }
+    .project-card {
+      border-radius: 20px; overflow: hidden;
+      border: 1.5px solid #eee;
+      transition: transform .3s, box-shadow .3s;
+      cursor: pointer;
+    }
+    .project-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,.1); }
+    .card-thumb {
+      aspect-ratio: 16/9;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      position: relative; overflow: hidden;
+    }
+    .card-thumb .overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .3s;
+      color: #fff; font-size: 1.4rem; font-weight: 600;
+      font-family: 'Syne', sans-serif; letter-spacing: -0.5px;
+      gap: .5rem;
+    }
+    .project-card:hover .overlay { opacity: 1; }
+    .card-body { padding: 1.4rem; }
+    .card-tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .75rem; }
+    .card-tag { font-size: .72rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--soft); }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: .4rem; }
+    .card-desc { font-size: .88rem; color: var(--mid); line-height: 1.7; }
+
+    .c1 { background: linear-gradient(135deg, #e8e4ff, #c8beff); }
+    .c2 { background: linear-gradient(135deg, #ffd6d6, #ffb5b5); }
+    .c3 { background: linear-gradient(135deg, #d4f5e9, #a8e6cf); }
+    .c4 { background: linear-gradient(135deg, #fff0d6, #ffd699); }
+    .c5 { background: linear-gradient(135deg, #d6eeff, #a8d4ff); }
+    .c6 { background: linear-gradient(135deg, #f5d6ff, #e0a8ff); }
+
+    /* ── Services ── */
+    #services { background: var(--ink); color: #fff; }
+    #services .section-title { color: #fff; }
+    #services .section-label { color: #a09dff; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .service-card {
+      padding: 2rem;
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      transition: background .3s, border-color .3s, transform .3s;
+      cursor: default;
+    }
+    .service-card:hover {
+      background: rgba(91,76,245,.15);
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+    .service-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .service-card h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; }
+    .service-card p { font-size: .88rem; color: rgba(255,255,255,.55); line-height: 1.7; }
+
+    /* ── Testimonials ── */
+    #testimonials { background: #f8f8fc; }
+    .testi-track-wrap { overflow: hidden; margin-top: 3rem; }
+    .testi-track {
+      display: flex; gap: 1.5rem;
+      animation: slide 22s linear infinite;
+      width: max-content;
+    }
+    .testi-track:hover { animation-play-state: paused; }
+    @keyframes slide {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .testi-card {
+      width: 320px; flex-shrink: 0;
+      background: #fff; border-radius: 18px;
+      padding: 1.8rem; border: 1.5px solid #eee;
+    }
+    .testi-stars { color: #f5c518; font-size: 1rem; margin-bottom: .8rem; }
+    .testi-text { font-size: .9rem; color: var(--mid); line-height: 1.7; margin-bottom: 1.2rem; }
+    .testi-author { display: flex; align-items: center; gap: .75rem; }
+    .testi-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .testi-name { font-weight: 600; font-size: .9rem; }
+    .testi-role { font-size: .78rem; color: var(--soft); }
+
+    /* ── Contact ── */
+    #contact { background: #fff; }
+    .contact-wrap {
+      max-width: 700px; margin: 0 auto; text-align: center;
+    }
+    .contact-wrap .section-title { margin-bottom: 1rem; }
+    .contact-wrap p { color: var(--mid); line-height: 1.8; margin-bottom: 2rem; }
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-field {
+      padding: .85rem 1.1rem;
+      border: 1.5px solid #e5e5e5;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-size: .95rem;
+      outline: none;
+      transition: border-color .3s, box-shadow .3s;
+      background: #fafaff;
+      width: 100%;
+    }
+    .form-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(91,76,245,.12);
+    }
+    textarea.form-field { resize: vertical; min-height: 130px; }
+    .submit-btn {
+      background: var(--accent); color: #fff;
+      padding: .9rem 2.4rem; border-radius: 100px;
+      border: none; font-size: 1rem; font-weight: 600;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: box-shadow .3s, transform .2s;
+      align-self: flex-start;
+    }
+    .submit-btn:hover {
+      box-shadow: 0 8px 28px rgba(91,76,245,.4);
+      transform: translateY(-2px);
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--ink); color: rgba(255,255,255,.45);
+      padding: 2.5rem 6vw;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    footer .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; }
+    footer .logo span { color: var(--accent); }
+    .social-links { display: flex; gap: 1rem; }
+    .social-links a {
+      color: rgba(255,255,255,.5); font-size: 1.2rem;
+      transition: color .25s;
+    }
+    .social-links a:hover { color: var(--accent); }
+
+    /* ── Reveal animation ── */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity .7s, transform .7s;
+    }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    /* ── Responsive ── */
+    @media(max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+    /* ── WhatsApp Floating Button ── */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #25D366;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(37,211,102,.22);
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .whatsapp-float:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(37,211,102,.28); }
+    .whatsapp-float svg { width: 26px; height: 26px; display: block; }
+    @media(max-width:480px){ .whatsapp-float{ right:16px; bottom:16px; width:50px; height:50px; } }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- ── Navbar ── -->
+  <nav class="nav-wrap" id="navbar">
+    <a href="#hero" class="nav-logo">Alex<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="btn-primary-custom d-none d-md-block" style="padding:.6rem 1.4rem;font-size:.85rem;">Hire Me</a>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section id="hero">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+    <div class="hero-inner">
+      <p class="hero-eyebrow">👋 Available for freelance work</p>
+      <h1 class="hero-title">
+        Creative Developer<br>
+        <span class="line2">&amp; UI Designer</span>
+      </h1>
+      <p class="hero-sub">
+        I craft fast, beautiful, and thoughtful digital products — from landing pages to full-stack web apps. Based in India, working globally.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary-custom">View My Work <i class="bi bi-arrow-right ms-1"></i></a>
+        <a href="#contact" class="btn-ghost">Get in Touch</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section id="about">
+    <div class="about-grid reveal">
+      <div class="about-img-wrap">
+        <div class="frame">
+          <i class="bi bi-person-fill" style="color:var(--accent);"></i>
+        </div>
+        <div class="badge">
+          <span>5+</span>
+          Years of<br>Experience
+        </div>
+      </div>
+      <div>
+        <p class="section-label">About Me</p>
+        <h2 class="section-title" style="margin-bottom:1.2rem;">Building with code,<br>thinking with design</h2>
+        <p style="color:var(--mid);line-height:1.8;margin-bottom:1rem;">
+          I'm Alex Mercer — a full-stack developer and UI/UX designer who believes that great software is invisible. It just works, and it feels effortless to use.
+        </p>
+        <p style="color:var(--mid);line-height:1.8;">
+          With experience across startups and agencies, I've shipped products used by thousands, led design systems, and mentored junior developers. I love turning complex problems into clean, elegant solutions.
+        </p>
+        <div class="stat-row">
+          <div class="stat-item"><div class="num">40+</div><div class="label">Projects Done</div></div>
+          <div class="stat-item"><div class="num">28</div><div class="label">Happy Clients</div></div>
+          <div class="stat-item"><div class="num">5★</div><div class="label">Avg Rating</div></div>
+        </div>
+        <div class="skill-tags" style="margin-top:1.8rem;">
+          <span class="skill-tag">React</span>
+          <span class="skill-tag">Node.js</span>
+          <span class="skill-tag">TypeScript</span>
+          <span class="skill-tag">Figma</span>
+          <span class="skill-tag">Next.js</span>
+          <span class="skill-tag">Tailwind</span>
+          <span class="skill-tag">PostgreSQL</span>
+          <span class="skill-tag">Python</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Projects ── -->
+  <section id="projects">
+    <div class="reveal">
+      <p class="section-label">Selected Work</p>
+      <h2 class="section-title">Projects I'm proud of</h2>
+    </div>
+    <div class="projects-grid reveal">
+
+      <div class="project-card">
+        <div class="card-thumb c1">
+          <span>🛒</span>
+          <div class="overlay"><i class="bi bi-arrow-up-right"></i> View Project</div>
+        </div>
+        <div class="card-body">
+          <div class="card-tags"><span class="card-tag">React</span><span class="card-tag">·</span><span class="card-tag">Node.js</span><span class="card-tag">·</span><span class="card-tag">MongoDB</span></div>
+          <div class="card-title">ShopMate – E-Commerce Platform</div>
+          <div class="card-desc">Full-stack marketplace with real-time inventory, Stripe payments, and an admin analytics dashboard.</div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-thumb c2">
+          <span>💬</span>
+          <div class="overlay"><i class="bi bi-arrow-up-right"></i> View Project</div>
+        </div>
+        <div class="card-body">
+          <div class="card-tags"><span class="card-tag">Next.js</span><span class="card-tag">·</span><span class="card-tag">Socket.io</span><span class="card-tag">·</span><span class="card-tag">Prisma</span></div>
+          <div class="card-title">Collab – Team Chat App</div>
+          <div class="card-desc">Slack-inspired real-time messaging platform with channels, threads, and file sharing.</div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-thumb c3">
+          <span>📊</span>
+          <div class="overlay"><i class="bi bi-arrow-up-right"></i> View Project</div>
+        </div>
+        <div class="card-body">
+          <div class="card-tags"><span class="card-tag">React</span><span class="card-tag">·</span><span class="card-tag">D3.js</span><span class="card-tag">·</span><span class="card-tag">Python</span></div>
+          <div class="card-title">Insight – Analytics Dashboard</div>
+          <div class="card-desc">Data visualization dashboard with interactive charts, filters, and CSV export for SaaS metrics.</div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-thumb c4">
+          <span>🎵</span>
+          <div class="overlay"><i class="bi bi-arrow-up-right"></i> View Project</div>
+        </div>
+        <div class="card-body">
+          <div class="card-tags"><span class="card-tag">React Native</span><span class="card-tag">·</span><span class="card-tag">Spotify API</span></div>
+          <div class="card-title">TuneBox – Music Discovery</div>
+          <div class="card-desc">Mobile app that surfaces personalized playlists using listening history and mood detection.</div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-thumb c5">
+          <span>🏠</span>
+          <div class="overlay"><i class="bi bi-arrow-up-right"></i> View Project</div>
+        </div>
+        <div class="card-body">
+          <div class="card-tags"><span class="card-tag">Next.js</span><span class="card-tag">·</span><span class="card-tag">Mapbox</span><span class="card-tag">·</span><span class="card-tag">Supabase</span></div>
+          <div class="card-title">NestFinder – Property Search</div>
+          <div class="card-desc">Interactive real-estate platform with map-based search, virtual tours, and mortgage calculator.</div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-thumb c6">
+          <span>🤖</span>
+          <div class="overlay"><i class="bi bi-arrow-up-right"></i> View Project</div>
+        </div>
+        <div class="card-body">
+          <div class="card-tags"><span class="card-tag">Python</span><span class="card-tag">·</span><span class="card-tag">FastAPI</span><span class="card-tag">·</span><span class="card-tag">OpenAI</span></div>
+          <div class="card-title">BriefBot – AI Writing Assistant</div>
+          <div class="card-desc">AI-powered content tool that drafts briefs, emails, and social copy from a single prompt.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Services ── -->
+  <section id="services">
+    <div class="reveal">
+      <p class="section-label">What I Do</p>
+      <h2 class="section-title">Services I offer</h2>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card">
+        <div class="service-icon">🎨</div>
+        <h4>UI / UX Design</h4>
+        <p>Wireframes, prototypes, and pixel-perfect interfaces built in Figma with accessibility baked in.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">⚡</div>
+        <h4>Frontend Dev</h4>
+        <p>Fast, responsive web apps using React, Next.js, and Tailwind — optimised for Core Web Vitals.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🛠️</div>
+        <h4>Backend & APIs</h4>
+        <p>Robust REST and GraphQL APIs with Node.js, PostgreSQL, and cloud deployment on Vercel or AWS.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📱</div>
+        <h4>Mobile Apps</h4>
+        <p>Cross-platform apps with React Native that feel native on both iOS and Android.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔍</div>
+        <h4>SEO & Performance</h4>
+        <p>Audits, optimisations, and structured data implementation to rank and load faster.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🤝</div>
+        <h4>Consulting</h4>
+        <p>Tech-stack selection, architecture review, and hands-on mentoring for teams scaling fast.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ── -->
+  <section id="testimonials">
+    <div class="reveal">
+      <p class="section-label">Kind Words</p>
+      <h2 class="section-title">What clients say</h2>
+    </div>
+    <div class="testi-track-wrap reveal">
+      <div class="testi-track">
+        <!-- Set 1 -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Alex delivered a beautiful, fast website in half the time we expected. The attention to detail was unmatched — every hover state, every transition felt intentional."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#e8e4ff;">👩</div>
+            <div><div class="testi-name">Sarah Chen</div><div class="testi-role">CPO, Launchpad SaaS</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"The dashboard Alex built handles real-time data for 10k+ users seamlessly. Clean code, great docs, and always a pleasure to work with."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#d4f5e9;">👨</div>
+            <div><div class="testi-name">Marcus Riley</div><div class="testi-role">CTO, DataVault</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"From wireframe to production in three weeks. Alex brings both creative and technical thinking — a rare combination. We will hire again."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#fff0d6;">👩</div>
+            <div><div class="testi-name">Priya Nair</div><div class="testi-role">Founder, Bloom Studio</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Our conversion rate jumped 34% after Alex redesigned the checkout flow. Data-informed design that actually moves the needle."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#ffd6d6;">👨</div>
+            <div><div class="testi-name">Tom Adeyemi</div><div class="testi-role">Growth Lead, CartCo</div></div>
+          </div>
+        </div>
+        <!-- Duplicate for infinite scroll -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Alex delivered a beautiful, fast website in half the time we expected. The attention to detail was unmatched — every hover state, every transition felt intentional."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#e8e4ff;">👩</div>
+            <div><div class="testi-name">Sarah Chen</div><div class="testi-role">CPO, Launchpad SaaS</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"The dashboard Alex built handles real-time data for 10k+ users seamlessly. Clean code, great docs, and always a pleasure to work with."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#d4f5e9;">👨</div>
+            <div><div class="testi-name">Marcus Riley</div><div class="testi-role">CTO, DataVault</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"From wireframe to production in three weeks. Alex brings both creative and technical thinking — a rare combination. We will hire again."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#fff0d6;">👩</div>
+            <div><div class="testi-name">Priya Nair</div><div class="testi-role">Founder, Bloom Studio</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Our conversion rate jumped 34% after Alex redesigned the checkout flow. Data-informed design that actually moves the needle."</p>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:#ffd6d6;">👨</div>
+            <div><div class="testi-name">Tom Adeyemi</div><div class="testi-role">Growth Lead, CartCo</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ── -->
+  <section id="contact">
+    <div class="contact-wrap reveal">
+      <p class="section-label">Let's Talk</p>
+      <h2 class="section-title">Have a project in mind?</h2>
+      <p>I'm currently taking on new freelance projects. Fill in the form and I'll get back to you within 24 hours.</p>
+      <!-- WhatsApp contact block -->
+      <div class="wa-contact" style="margin:1.2rem 0 0 0;">
+        <a href="https://wa.me/YOUR_NUMBER?text=Hi%20Alex%2C%20I%20found%20your%20site%20and%20want%20to%20talk%20about%20a%20project" class="wa-btn" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
+          <i class="bi bi-whatsapp" style="font-size:1.05rem;color:#fff"></i>
+          <span>Message on WhatsApp</span>
+        </a>
+        <div style="font-size:.95rem;color:var(--mid);align-self:center;">
+          Or message me at <strong id="wa-number">+YOUR_NUMBER</strong>
+        </div>
+      </div>
+      <div class="contact-form">
+        <div class="form-row">
+          <input class="form-field" type="text" placeholder="Your Name" />
+          <input class="form-field" type="email" placeholder="Email Address" />
+        </div>
+        <input class="form-field" type="text" placeholder="Project Type (e.g. Web App, Landing Page)" />
+        <textarea class="form-field" placeholder="Tell me about your project..."></textarea>
+        <button class="submit-btn" onclick="handleSubmit(this)">
+          Send Message <i class="bi bi-send ms-1"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div>
+      <span class="logo">Alex<span>.</span></span>
+      <div style="font-size:.82rem;margin-top:.3rem;">© 2026 Alex Mercer. All rights reserved.</div>
+    </div>
+    <div class="social-links">
+      <a href="#"><i class="bi bi-github"></i></a>
+      <a href="#"><i class="bi bi-linkedin"></i></a>
+      <a href="#"><i class="bi bi-twitter-x"></i></a>
+      <a href="#"><i class="bi bi-dribbble"></i></a>
+    </div>
+  </footer>
+  
+  <!-- WhatsApp floating button (replace YOUR_NUMBER with country code+number, e.g. 15551234567) -->
+  <a href="https://wa.me/YOUR_NUMBER" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <i class="bi bi-whatsapp" style="font-size:1.35rem;color:#fff;"></i>
+  </a>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ── Custom cursor ── */
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function animate(){
+      cursor.style.transform = `translate(${mx-5}px,${my-5}px)`;
+      rx += (mx - rx) * .14;
+      ry += (my - ry) * .14;
+      ring.style.transform = `translate(${rx-18}px,${ry-18}px)`;
+      requestAnimationFrame(animate);
+    })();
+    document.querySelectorAll('a,button,.project-card,.service-card').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.style.cssText += 'width:56px;height:56px;border-color:var(--accent2);');
+      el.addEventListener('mouseleave', () => ring.style.cssText += 'width:36px;height:36px;border-color:var(--accent);');
+    });
+
+    /* ── Navbar scroll ── */
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', scrollY > 60);
+    });
+
+    /* ── Scroll reveal ── */
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); } });
+    }, { threshold: .12 });
+    reveals.forEach(r => io.observe(r));
+
+    /* ── Contact submit ── */
+    function handleSubmit(btn){
+      btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Sent!';
+      btn.style.background = '#22c55e';
+      setTimeout(()=>{ btn.innerHTML = 'Send Message <i class="bi bi-send ms-1"></i>'; btn.style.background=''; }, 3000);
+    }
+  </script>
+</body>
+</html>
